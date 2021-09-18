@@ -21,7 +21,11 @@ function createCartItemElement({ sku, name, salePrice }) {
   const li = document.createElement('li');
   li.className = 'cart__item';
   li.innerText = `SKU: ${sku} | NAME: ${name} | PRICE: $${salePrice}`;
-  li.addEventListener('click', cartItemClickListener);
+  if (li.addEventListener('click', cartItemClickListener)) {
+    li.addEventListener('click', cartItemClickListener);
+    const pPrice = document.querySelector('p');
+    pPrice.innerText = (parseFloat(pPrice.innerText) - parseFloat(salePrice)).toFixed(2);
+  }
   return li;
 }
 
@@ -44,8 +48,8 @@ async function getCartApi(productID) {
   ol.appendChild(createCartItemElement(
     { sku: dataFull2.id, name: dataFull2.title, salePrice: dataFull2.price },
     ));
-  const pPrice = document.querySelector('p');
-  pPrice.innerText = (parseFloat(pPrice.innerText) + parseFloat(dataFull2.price)).toFixed(2);
+  const pPric = document.querySelector('p');
+  pPric.innerText = (parseFloat(pPric.innerText) + parseFloat(dataFull2.price)).toFixed(2);
   ol.addEventListener('change', saveData());
 }
 
@@ -94,8 +98,19 @@ function realoadItem() {
   });
 }
 
+function clearButton() {
+  const clearBut = document.querySelector('.empty-cart');
+  const olBut = document.querySelector('.cart__items');
+  clearBut.addEventListener('click', () => {
+    while (olBut.firstChild) {
+      olBut.removeChild(olBut.firstChild);
+    }
+  });
+}
+
 window.onload = () => {
   getFullApi();
   realoadItem();
   createPriceParagraph();
+  clearButton();
  };
