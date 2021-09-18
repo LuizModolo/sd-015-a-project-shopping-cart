@@ -32,7 +32,14 @@ function createCartItemElement({ sku, name, salePrice }) {
 
 function saveData() {
   const ol4 = document.querySelector(olClass);
-  return localStorage.setItem('texto', ol4.innerHTML);
+  const saveItens = localStorage.setItem('texto', ol4.innerHTML);
+  return saveItens;
+}
+
+function saveData2() {
+  const paragraphPrice = document.querySelector('.total-price');
+  const saveCount = localStorage.setItem('count', paragraphPrice.innerText);
+  return saveCount;
 }
 
 function createPriceParagraph() {
@@ -53,6 +60,7 @@ async function getCartApi(productID) {
   const pPric = document.querySelector('p');
   pPric.innerText = (parseFloat(pPric.innerText) + parseFloat(dataFull2.price));
   ol2.addEventListener('change', saveData());
+  ol2.addEventListener('change', saveData2());
 }
 
 function createCustomElement(element, className, innerText) {
@@ -80,7 +88,21 @@ function createProductItemElement({ sku, name, image }) {
   return section;
 }
 
+function createLoadingParagraph() {
+  const body = document.querySelector('body');
+  const pLoading = document.createElement('h1');
+  pLoading.classList.add('loading');
+  body.appendChild(pLoading);
+  pLoading.innerText = 'Loading';
+}
+
+function removeLoadingParagraph() {
+  const pLoading = document.querySelector('h1');
+  pLoading.remove();
+}
+
 async function getFullApi() {
+  createLoadingParagraph();
   const data = await fetch('https://api.mercadolibre.com/sites/MLB/search?q=computador');
   const dataFull = await data.json();
   const arrayProdutos = getComputerApi(dataFull.results);
@@ -89,15 +111,26 @@ async function getFullApi() {
     const sectionProduct = document.querySelector('.items');
     sectionProduct.appendChild(printProduct);
   });
+  removeLoadingParagraph();
 }
 
-function realoadItem() {
+function reloadItem() {
   const ol3 = document.querySelector(olClass);
   ol3.innerHTML = localStorage.getItem('texto');
   const li = document.querySelectorAll('.cart__item');
   li.forEach((singleLi) => {
     singleLi.addEventListener('click', cartItemClickListener);
   });
+}
+
+function reloadItem2() {
+  const paragraphPrice = document.querySelector('.total-price');
+  console.log(paragraphPrice.innerText);
+  console.log(paragraphPrice);
+  if (!paragraphPrice) {
+    console.log('entrou');
+    paragraphPrice.innerText = localStorage.getItem('count');
+  }
 }
 
 function clearButton() {
@@ -112,7 +145,8 @@ function clearButton() {
 
 window.onload = () => {
   getFullApi();
-  realoadItem();
   createPriceParagraph();
+  reloadItem();
+  reloadItem2();
   clearButton();
  };
